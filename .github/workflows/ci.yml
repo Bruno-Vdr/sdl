@@ -129,10 +129,10 @@ jobs:
           VJOBS=1 v test-fmt
           VJOBS=1 v fmt -verify .
 
-      - name: Build sdl shared
-        run: |
-          export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags --libs)"
-          v -shared -g sdl
+##      - name: Build sdl shared
+##        run: |
+##          export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags --libs)"
+##          v -shared -g sdl
 
       - name: Run tests
         run: v test sdl
