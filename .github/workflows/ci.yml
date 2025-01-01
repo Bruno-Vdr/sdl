@@ -39,7 +39,7 @@ jobs:
           check-latest: true
 
       - name: Checkout SDL
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: sdl
 
@@ -82,14 +82,15 @@ jobs:
     timeout-minutes: 60
     env:
       SDL2_VERSION: 2.0.8
+      CFLAGS: -fpermissive -std=c99
     steps:
       - name: Checkout V
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: vlang/v
 
       - name: Build local v
-        run: make -j4 && ./v symlink
+        run: make && ./v symlink
 
       - name: Install dependencies
         run: |
@@ -107,7 +108,7 @@ jobs:
           make install
 
       - name: Checkout SDL
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: sdl
 
@@ -159,7 +160,7 @@ jobs:
           check-latest: true
 
       - name: Checkout SDL
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: sdl
 
@@ -195,7 +196,7 @@ jobs:
           check-latest: true
 
       - name: Checkout SDL
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: sdl
 
