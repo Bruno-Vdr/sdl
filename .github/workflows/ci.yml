@@ -49,9 +49,6 @@ jobs:
           mkdir -p ~/.vmodules
           ln -s $(pwd) ~/.vmodules/sdl
 
-      - name: Run setup.vsh
-        run: v run ~/.vmodules/sdl/setup.vsh
-
       - name: Test code formatting
         run: |
           cd sdl
@@ -81,10 +78,10 @@ jobs:
           test "${SDL2_VERSION}" = "$VER" || exit 1
 
   macos:
-    runs-on: macos-14
+    runs-on: macos-13
     timeout-minutes: 60
     env:
-      SDL2_VERSION: 2.30.0
+      SDL2_VERSION: 2.0.8
     steps:
       - name: Checkout V
         uses: actions/checkout@v2
@@ -92,22 +89,22 @@ jobs:
           repository: vlang/v
 
       - name: Build local v
-        run: make && ./v symlink
+        run: make -j4 && ./v symlink
 
       - name: Install dependencies
         run: |
           brew install sdl2_ttf sdl2_mixer sdl2_image
-##          curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
-##          tar -zxvf SDL2.tar.gz
-##
-##      - name: Build SDL
-##        run: |
-##          cd SDL2-${SDL2_VERSION}
-##          mkdir build
-##          cd build
-##          ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
-##          make
-##          make install
+          curl -L https://www.libsdl.org/release/SDL2-${SDL2_VERSION}.tar.gz -o SDL2.tar.gz
+          tar -zxvf SDL2.tar.gz
+
+      - name: Build SDL
+        run: |
+          cd SDL2-${SDL2_VERSION}
+          mkdir build
+          cd build
+          ../configure --prefix /tmp/sdl2-${SDL2_VERSION}
+          make
+          make install
 
       - name: Checkout SDL
         uses: actions/checkout@v2
@@ -120,18 +117,16 @@ jobs:
           mkdir -p ~/.vmodules
           ln -s $(pwd) ~/.vmodules/sdl
 
-      - name: Run setup.vsh
-        run: v run ~/.vmodules/sdl/setup.vsh
-
       - name: Test code formatting
         run: |
           cd sdl
           VJOBS=1 v test-fmt
           VJOBS=1 v fmt -verify .
-          ##      - name: Build sdl shared
-          ##        run: |
-          ##          export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags --libs)"
-          ##          v -shared -g sdl
+
+      - name: Build sdl shared
+        run: |
+          export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags --libs)"
+          v -shared -g sdl
 
       - name: Run tests
         run: v test sdl
@@ -139,16 +134,16 @@ jobs:
       - name: Build sdl examples
         run: |
           v shader sdl/examples/sdl_opengl_and_sokol
-          ##          export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags --libs)"
+          export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags --libs)"
           v run sdl/examples/versions
           v should-compile-all sdl/examples/
 
       - name: Test SDL version
         run: |
-          ##          export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags --libs)"
+          export CFLAGS="$(/tmp/sdl2-${SDL2_VERSION}/bin/sdl2-config --cflags --libs)"
           VER="$(v run sdl/examples/version)"
           echo "${SDL2_VERSION} == $VER ?"
-          ##          test "${SDL2_VERSION}" = "$VER" || exit 1
+          test "${SDL2_VERSION}" = "$VER" || exit 1
 
   windows-gcc:
     runs-on: windows-latest
@@ -211,7 +206,8 @@ jobs:
         run: v run sdl/windows_install_dependencies.vsh
 
       - name: Move SDL folder to ~/.vmodules/sdl
-        run: move-item -force sdl $home\.vmodules\
+        run: |
+          move-item -force sdl $home\.vmodules\
 
       - name: Build sdl examples
         run: |
